@@ -51,105 +51,28 @@ namespace TaskManagementSystem
             {
                 Console.WriteLine("Tasks:");
                 for (int i = 0; i < pendingTasks.Count; i++) Console.WriteLine($"{i + 1}. {pendingTasks[i].Title}, Priotity {pendingTasks[i].Priority}");
-                string? input;
-                while (true)
-                {
-                    Console.Write("More info? (y/n): ");
-                    input = Console.ReadLine();
-                    if (input == null || input.Length < 1) Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
-                    else if (input != null && input.ToLower() != "y" && input.ToLower() != "n") Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
-                    else { input = input.ToLower(); break; }
-                }
-
-                Task? selectedTask;
-                if (input == "n") return;
-                else
-                {
-                    int choice = 0;
-                    while (true)
-                    {
-                        Console.Write("Enter the number of the task you want more info on: ");
-                        input = Console.ReadLine();
-                        if (!int.TryParse(input, out choice) || choice < 1 || choice > pendingTasks.Count) Console.WriteLine("Invalid input. Please enter a valid task number.");
-                        else break;
-                    }
-                    selectedTask = pendingTasks[choice - 1];
-                    selectedTask.Info();
-                }
-                while (true)
-                {
-                    Console.Write("Would you like to edit this task? (y/n): ");
-                    input = Console.ReadLine();
-                    if (input == null || input.Length < 1) Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
-                    else if (input != null && input.ToLower() != "y" && input.ToLower() != "n") Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
-                    else { input = input.ToLower(); break; }
-                }
-
-                if (input == "n") return;
-                else
-                {
-                    while (true)
-                    {
-                        Console.Write("Would you like to delete this task? (y/n): ");
-                        input = Console.ReadLine();
-                        if (input == null || input.Length < 1) Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
-                        else if (input != null && input.ToLower() != "y" && input.ToLower() != "n") Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
-                        else { input = input.ToLower(); break; }
-                    }
-
-                    if (input == "y")
-                    {
-                        pendingTasks.Remove(selectedTask);
-                        Console.WriteLine("Task successfully deleted!");
-                        return;
-                    }
-                    else { Console.WriteLine("Enter new details for the task (leave fields blank to keep current value):"); }
-
-                    Console.Write("Enter new title: ");
-                    input = Console.ReadLine();
-                    if (!string.IsNullOrEmpty(input)) selectedTask.Title = input;
-
-                    Console.Write("Enter new description: ");
-                    input = Console.ReadLine();
-                    if (!string.IsNullOrEmpty(input)) selectedTask.Description = input;
-
-                    while (true)
-                    {
-                        Console.Write("Enter new expected duration in hours: ");
-                        input = Console.ReadLine();
-                        if (string.IsNullOrEmpty(input)) break;
-                        int newDuration;
-                        if (!int.TryParse(input, out newDuration) || newDuration < 1) Console.WriteLine("Please enter a valid number greater than 0");
-                        else { selectedTask.ExpectedDuration = newDuration; break; }
-                    }
-
-                    while (true)
-                    {
-                        Console.Write("Enter new priority (1-5, with 1 being highest): ");
-                        input = Console.ReadLine();
-                        if (string.IsNullOrEmpty(input)) break;
-                        int newPriority;
-                        if (!int.TryParse(input, out newPriority) || newPriority < 1 || newPriority > 5) Console.WriteLine("Please enter a valid number between 1 and 5");
-                        else { selectedTask.Priority = newPriority; break; }
-                    }
-                    Console.WriteLine("Task updated successfully!");
-                }
+                string currentList = "pending";
+                EditTask(currentList);
             }
         }
 
         static void ViewCompletedTasks()
         {
-            if (completedTasks == null || completedTasks.Count < 1) { Console.WriteLine("No completed tasks available."); return; }
+            if (completedTasks == null || completedTasks.Count < 1) { Console.WriteLine("No completed tasks available."); }
             else
             {
                 Console.WriteLine("Completed Tasks:");
                 for (int i = 0; i < completedTasks.Count; i++)
                 {
                     Console.WriteLine($"{i + 1}. {completedTasks[i].Title}, Priotity {completedTasks[i].Priority}, Expected Duration: {completedTasks[i].ExpectedDuration} hours, Actual Duration: {completedTasks[i].ActualDuration} hours");
-                    return;
+                    string currentList = "completed";
+                    EditTask(currentList);
                 }
             }
+        }
 
+        static void EditTask(string currentList)
+        {
             string? input;
             while (true)
             {
@@ -159,7 +82,7 @@ namespace TaskManagementSystem
                 else if (input != null && input.ToLower() != "y" && input.ToLower() != "n") Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
                 else { input = input.ToLower(); break; }
             }
-
+            
             Task? selectedTask;
             if (input == "n") return;
             else
@@ -169,17 +92,22 @@ namespace TaskManagementSystem
                 {
                     Console.Write("Enter the number of the task you want more info on: ");
                     input = Console.ReadLine();
-                    if (!int.TryParse(input, out choice) || choice < 1 || choice > completedTasks.Count) Console.WriteLine("Invalid input. Please enter a valid task number.");
-                    else break;
+                    if (currentList == "pending")
+                    {
+                        if (!int.TryParse(input, out choice) || choice < 1 || choice > pendingTasks.Count) Console.WriteLine("Invalid input. Please enter a valid task number.");
+                        else { selectedTask = pendingTasks[choice - 1]; selectedTask.Info(); break; }
+                    }
+                    else if (currentList = "completed")
+                    {
+                        if (!int.TryParse(input, out choice) || choice < 1 || choice > completedTasks.Count) Console.WriteLine("Invalid input. Please enter a valid task number.");
+                        else { selectedTask = completedTasks[choice - 1]; selectedTask.Info(); break; }
+                    }
                 }
-                selectedTask = completedTasks[choice - 1];
-                selectedTask.Info();
-                Console.WriteLine($"Actual Duration: {selectedTask.ActualDuration} hours");
             }
-
+            
             while (true)
             {
-                Console.Write("Would you like to unmark as completed? (y/n): ");
+                Console.Write("Would you like to edit this task? (y/n): ");
                 input = Console.ReadLine();
                 if (input == null || input.Length < 1) Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
                 else if (input != null && input.ToLower() != "y" && input.ToLower() != "n") Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
@@ -189,14 +117,78 @@ namespace TaskManagementSystem
             if (input == "n") return;
             else
             {
-                selectedTask.IsCompleted = false;
-                selectedTask.ActualDuration = 0;
-                pendingTasks.Add(selectedTask);
-                completedTasks.Remove(selectedTask);
-                Console.WriteLine("Task successfully marked as pending!");
+                while (true)
+                {
+                    Console.Write("Would you like to delete this task? (y/n): ");
+                    input = Console.ReadLine();
+                    if (input == null || input.Length < 1) Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+                    else if (input != null && input.ToLower() != "y" && input.ToLower() != "n") Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+                    else { input = input.ToLower(); break; }
+                }
+
+                if (input == "y")
+                {
+                    if (currentList == "pending") pendingTasks.Remove(selectedTask);
+                    else completedTasks.Remove(selectedTask);
+                    
+                    Console.WriteLine("Task successfully deleted!");
+                    return;
+                }
+                else Console.WriteLine("Enter new details for the task (leave fields blank to keep current value):");
+
+                Console.Write("Enter new title: ");
+                input = Console.ReadLine();
+                if (!string.IsNullOrEmpty(input)) selectedTask.Title = input;
+
+                Console.Write("Enter new description: ");
+                input = Console.ReadLine();
+                if (!string.IsNullOrEmpty(input)) selectedTask.Description = input;
+
+                if (currentList == "pending")
+                {
+                    while (true)
+                    {
+                        Console.Write("Enter new expected duration in hours: ");
+                        input = Console.ReadLine();
+                        if (string.IsNullOrEmpty(input)) break;
+                        int newDuration;
+                        if (!int.TryParse(input, out newDuration) || newDuration < 1) Console.WriteLine("Please enter a valid number greater than 0");
+                        else { selectedTask.ExpectedDuration = newDuration; break; }
+                    }
+    
+                    while (true)
+                    {
+                        Console.Write("Enter new priority (1-5, with 1 being highest): ");
+                        input = Console.ReadLine();
+                        if (string.IsNullOrEmpty(input)) break;
+                        int newPriority;
+                        if (!int.TryParse(input, out newPriority) || newPriority < 1 || newPriority > 5) Console.WriteLine("Please enter a valid number between 1 and 5");
+                        else { selectedTask.Priority = newPriority; break; }
+                    }
+                }
+                else
+                {
+                    while (true)
+                    {
+                        Console.Write("Would you like mark this task as pending again? (y/n): ");
+                        input = Console.ReadLine();
+                        if (string.IsNullOrEmpty(input) || input.ToLower() != "y" || input.ToLower() != "n") Console.WriteLine("Invalid input");
+                        else { input = input.ToLower(); break; }
+                    }
+                    
+                    if (input == "n") return;
+                    else
+                    {
+                        selectedTask.IsCompleted = false;
+                        selectedTask.ActualDuration = 0;
+                        pendingTasks.Add(selectedTask);
+                        completedTasks.Remove(selectedTask);
+                        Console.WriteLine("Task successfully marked as pending!");
+                    }
+                }
+                Console.WriteLine("Task updated successfully!");
             }
         }
-
         static void AddTask()
         {
             string title = "";
@@ -244,47 +236,39 @@ namespace TaskManagementSystem
 
         static void MarkAsCompleted()
         {
-            if (pendingTasks.Count == 0)
+            if (pendingTasks.Count == 0) { Console.WriteLine("No tasks available."); return; }
+            else 
             {
-                Console.WriteLine("No tasks available.");
-                return;
+                Console.WriteLine("Pending Tasks:");
+                for (int i = 0; i < pendingTasks.Count; i++) Console.WriteLine($"{i + 1}. {pendingTasks[i].Title}, Priotity {pendingTasks[i].Priority}");
             }
-            else
+            int choice = 0;
+            string? input;
+
+            while (true)
             {
-                if (pendingTasks.Count == 0) { Console.WriteLine("No tasks available."); return; }
-                else 
-                {
-                    Console.WriteLine("Pending Tasks:");
-                    for (int i = 0; i < pendingTasks.Count; i++) Console.WriteLine($"{i + 1}. {pendingTasks[i].Title}, Priotity {pendingTasks[i].Priority}");
-                }
-                int choice = 0;
-                string? input;
-
-                while (true)
-                {
-                    Console.Write("Enter the number of the task you want to mark as completed: ");
-                    input = Console.ReadLine();
-                    if (!int.TryParse(input, out choice) || choice < 1 || choice > pendingTasks.Count) Console.WriteLine("Invalid input. Please enter a valid task number.");
-                    else break;
-                }
-
-                Task taskToComplete = pendingTasks[choice - 1];
-                int actualDuration = 0;
-
-                while (true)
-                {
-                    Console.Write("Enter the actual duration taken to complete the task (in hours): ");
-                    input = Console.ReadLine();
-                    if (!int.TryParse(input, out actualDuration) || actualDuration < 1) Console.WriteLine("Please enter a valid number greater than 0");
-                    else break;
-                }
-
-                taskToComplete.IsCompleted = true;
-                taskToComplete.ActualDuration = actualDuration;
-                completedTasks.Add(taskToComplete);
-                pendingTasks.RemoveAt(choice - 1);
-                Console.WriteLine("Task marked as completed!");
+                Console.Write("Enter the number of the task you want to mark as completed: ");
+                input = Console.ReadLine();
+                if (!int.TryParse(input, out choice) || choice < 1 || choice > pendingTasks.Count) Console.WriteLine("Invalid input. Please enter a valid task number.");
+                else break;
             }
+
+            Task taskToComplete = pendingTasks[choice - 1];
+            int actualDuration = 0;
+
+            while (true)
+            {
+                Console.Write("Enter the actual duration taken to complete the task (in hours): ");
+                input = Console.ReadLine();
+                if (!int.TryParse(input, out actualDuration) || actualDuration < 1) Console.WriteLine("Please enter a valid number greater than 0");
+                else break;
+            }
+
+            taskToComplete.IsCompleted = true;
+            taskToComplete.ActualDuration = actualDuration;
+            completedTasks.Add(taskToComplete);
+            pendingTasks.RemoveAt(choice - 1);
+            Console.WriteLine("Task marked as completed!");
         }
     }
 }
