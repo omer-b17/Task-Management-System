@@ -5,5 +5,4 @@ A simple Console App Task Management System written in C# on VS Code that allows
 Includes the Task object with it's properties; Title, Description, IsCompleted, ExpectedHours, ActualHours, and Priority. And the Info method which displays all the details of a specific task to the user.
 
 ### Program.cs
-Includes the functions ViewPendingTasks, ViewCompletedTasks, AddTask, MarkAsCompleted.
-ViewPendingTask and ViewCompletedTasks also allow the user to edit a specific task if they so wish.
+Includes the functions ViewPendingTasks, ViewCompletedTasks, AddTask, MarkAsCompleted, and EditTask.
